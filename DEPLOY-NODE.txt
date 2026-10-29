@@ -1,0 +1,67 @@
+CONNECTIVO PORTAL - RUNNING IT ON YOUR OWN SERVER (Node.js)
+===========================================================
+This folder runs the whole portal (FinOps, Payroll/Attendance, Invoice, Projects) without Cloudflare.
+The file that starts everything is:  server.mjs
+
+WHAT YOU NEED
+- A server (Linux / Windows / Mac) with Node.js 18 or newer installed (https://nodejs.org, choose LTS).
+- Nothing else. No "npm install" is needed.
+
+START IT (to test)
+1. Copy this whole folder to the server and open a terminal inside it.
+2. Run:   node server.mjs
+3. Open http://localhost:3000  and sign in.
+   All your data is saved in the "data" folder next to server.mjs. BACK UP THAT FOLDER regularly.
+
+LOGINS (change the passwords after the first login - Profile screen)
+   shomvob  (CEO)        - your existing password
+   shoikot  (Admin)      - your existing password
+   shanto   (Developer)  - your existing password
+   abir     (Developer)  - password 12345678   <- full access, change it right away
+Note: on a brand-new server the three old accounts start from the starting passwords you set before.
+If you need to set a starting password for any account, create a hash with:
+   node scripts/hash-password.cjs "NewPassword"
+and start the server with the variable AUTH_SHANTO_HASH / AUTH_SHOMVOB_HASH / AUTH_SHOIKOT_HASH / AUTH_ABIR_HASH set to that text.
+(Used only the first time an account is created; after that passwords are changed inside the portal.)
+
+MOVE YOUR EXISTING DATA FROM CLOUDFLARE TO THE NEW SERVER
+1. On the old site, sign in as CEO or Developer. In each portal open Settings and press "Download data"
+   (FinOps, Payroll, Invoice and Projects each have it).
+2. On the new server, sign in and press "Upload data" in the same place, choosing the file you downloaded.
+   Everything (records, files, payslips, settings) is restored.
+
+PUT IT ON YOUR DOMAIN WITH HTTPS (recommended)
+Run the portal on port 3000 and put a web server in front of it that handles the https certificate.
+Easiest with Caddy (https://caddyserver.com) - the whole config is:
+      portal.yourcompany.com {
+          reverse_proxy localhost:3000
+      }
+Caddy gets the certificate automatically. With nginx use proxy_pass http://127.0.0.1:3000 and pass the
+headers  Host, X-Forwarded-Proto and X-Forwarded-For. Allow uploads of 100 MB (client_max_body_size 100m).
+(Or give Node your certificate directly: SSL_KEY=/path/key.pem SSL_CERT=/path/cert.pem node server.mjs)
+
+KEEP IT RUNNING
+- With pm2:      npm install -g pm2   then   pm2 start server.mjs --name connectivo   and   pm2 save   and   pm2 startup
+- Or with systemd (Linux) - /etc/systemd/system/connectivo.service:
+      [Unit]
+      Description=Connectivo portal
+      After=network.target
+      [Service]
+      WorkingDirectory=/path/to/this/folder
+      ExecStart=/usr/bin/node server.mjs
+      Environment=PORT=3000
+      Restart=always
+      User=www-data
+      [Install]
+      WantedBy=multi-user.target
+  then:  systemctl enable --now connectivo
+
+SETTINGS (optional environment variables)
+   PORT (default 3000), HOST (default 0.0.0.0), DATA_DIR (default ./data), SESSION_SECRET (made automatically),
+   SSL_KEY / SSL_CERT (to serve https from Node itself).
+
+EMAIL (payslips, invoices, attendance reports)
+Works exactly as before: Payroll > Settings > Email (Brevo or Resend API key). The server needs normal internet access to reach them.
+
+UPDATING LATER
+Replace the files (keep the "data" folder) and restart (pm2 restart connectivo).

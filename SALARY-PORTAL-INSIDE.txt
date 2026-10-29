@@ -1,0 +1,20 @@
+SALARY/ATTENDANCE PORTAL NOW LIVES INSIDE FINOPS
+=================================================
+* Sidebar item "Salary/Attendance Portal" opens the full salary portal inside FinOps.
+* Same login as FinOps (CEO, Developer, Admin accounts). No separate salary login.
+* Data is stored in the same Cloudflare KV (keys start with "sal:"). Daily backups kept 60 days.
+* Payroll Import reads finalized totals directly - SALARY_PORTAL_URL / KEY are no longer needed.
+
+DEPLOY: unzip, then in the folder run:   npx wrangler deploy
+(Works on Cloudflare's FREE plan: PDFs are created in your browser, the Worker only stores and emails them.)
+
+MOVE EXISTING SALARY DATA: in your old salary portal open Settings > Backup and download the file,
+then open the new Salary/Attendance Portal in FinOps > Settings > Restore and choose that file.
+Re-enter your Brevo/Resend key in Settings > Email once (keys are stored in KV, never in the page).
+
+SECURITY: README.md contains example passwords - do not keep real passwords in any file.
+
+MOBILE APP MODE
+On a phone the salary portal turns into an app: bottom tab bar, card lists, bottom-sheet forms,
+pull-to-refresh, Share payslip PDF. Open https://<your-address>/salary/ on the phone and use
+"Add to Home Screen" (iPhone: Share > Add to Home Screen; Android: menu > Install app) to get an app icon.

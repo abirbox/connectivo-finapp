@@ -1,0 +1,9 @@
+{
+  "name": "connectivo-portal",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Connectivo FinOps, Payroll/Attendance, Invoice and Projects portals",
+  "scripts": { "start": "node server.mjs" },
+  "engines": { "node": ">=18" }
+}

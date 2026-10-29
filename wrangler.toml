@@ -1,0 +1,14 @@
+name = "connectivo-finops"
+main = "src/worker.js"
+compatibility_date = "2026-09-25"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# This is the real KV namespace already created for this project
+# ("connectivo-finops-db") — nothing to change here.
+[[kv_namespaces]]
+binding = "DB"
+id = "9d2c9bb6b045454bbead7a5df0545c7a"
